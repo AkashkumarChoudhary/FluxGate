@@ -13,7 +13,8 @@
     "vitest": "^1.6.0",
     "@types/node": "^20.12.0",
     "@prisma/client": "^5.14.0",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "ioredis": "^5.4.0"
   },
   "engines": {
     "node": ">=20"
