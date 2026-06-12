@@ -28,11 +28,21 @@ enum ExecutionStatus {
   FAILED
 }
 
+enum TenantStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum StepStatus {
+  COMPLETED
+  FAILED
+}
+
 model Tenant {
   id         String        @id @default(uuid())
   name       String
   apiKeyHash String        @map("api_key_hash")
-  status     TriggerStatus @default(ACTIVE)
+  status     TenantStatus  @default(ACTIVE)
   createdAt  DateTime      @default(now()) @map("created_at")
   triggers   Trigger[]
 
@@ -62,7 +72,7 @@ model Action {
   config    Json
   order     Int        @default(0)
   createdAt DateTime   @default(now()) @map("created_at")
-  trigger   Trigger    @relation(fields: [triggerId], references: [id])
+  trigger   Trigger    @relation(fields: [triggerId], references: [id], onDelete: Cascade)
 
   @@index([triggerId])
   @@map("actions")
@@ -91,13 +101,13 @@ model ExecutionStep {
   executionId   String    @map("execution_id")
   actionId      String    @map("action_id")
   order         Int
-  status        String
+  status        StepStatus
   request       Json
   response      Json?
   durationMs    Int       @map("duration_ms")
   attemptNumber Int       @map("attempt_number")
   createdAt     DateTime  @default(now()) @map("created_at")
-  execution     Execution @relation(fields: [executionId], references: [id])
+  execution     Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
 
   @@unique([executionId, actionId, attemptNumber])
   @@map("execution_steps")
