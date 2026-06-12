@@ -3,11 +3,16 @@ import { tenantsRouter } from './routes/tenants';
 import { triggersRouter } from './routes/triggers';
 import { actionsRouter } from './routes/actions';
 import { webhooksRouter } from './routes/webhooks';
+import { registry } from '../metrics/registry';
 
 export function createApp(): Express {
   const app = express();
   app.use(express.json({ limit: '256kb' }));
   app.get('/healthz', (_req, res) => res.json({ ok: true }));
+  app.get('/metrics', async (_req, res) => {
+    res.set('content-type', registry.contentType);
+    res.end(await registry.metrics());
+  });
   app.use('/tenants', tenantsRouter);
   app.use('/triggers', triggersRouter);
   app.use('/triggers/:triggerId/actions', actionsRouter);
