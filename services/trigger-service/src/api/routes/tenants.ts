@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, type IRouter } from 'express';
 import { z } from 'zod';
 import { getPrisma } from '@fluxgate/db';
 import { generateApiKey, hashApiKey } from '../auth';
 
-export const tenantsRouter = Router();
+export const tenantsRouter: IRouter = Router();
 
 const createTenantSchema = z.object({ name: z.string().min(1).max(200) });
 

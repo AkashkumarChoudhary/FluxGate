@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, type IRouter } from 'express';
 import { z } from 'zod';
 import { getPrisma } from '@fluxgate/db';
 import { cronTriggerConfigSchema, webhookTriggerConfigSchema } from '@fluxgate/shared';
 import { apiKeyAuth, tenantIdOf } from '../auth';
 import { syncCronSchedule, removeCronSchedule } from '../../cron/schedule';
 
-export const triggersRouter = Router();
+export const triggersRouter: IRouter = Router();
 triggersRouter.use(apiKeyAuth);
 
 const createTriggerSchema = z.discriminatedUnion('type', [
