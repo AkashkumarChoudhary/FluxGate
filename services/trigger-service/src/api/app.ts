@@ -1,4 +1,4 @@
-import express, { type Express } from 'express';
+import express, { type Express, type Request, type Response, type NextFunction } from 'express';
 import { tenantsRouter } from './routes/tenants';
 import { triggersRouter } from './routes/triggers';
 import { actionsRouter } from './routes/actions';
@@ -17,5 +17,11 @@ export function createApp(): Express {
   app.use('/triggers', triggersRouter);
   app.use('/triggers/:triggerId/actions', actionsRouter);
   app.use('/webhooks', webhooksRouter);
+  // Catch unhandled async errors from routes (Express 4 requires explicit error forwarding).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    console.error('unhandled route error', err);
+    res.status(500).json({ error: 'internal server error' });
+  });
   return app;
 }
