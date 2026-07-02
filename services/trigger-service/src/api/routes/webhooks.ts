@@ -3,9 +3,11 @@ import { getPrisma } from '@fluxgate/db';
 import { webhookEventId, type TriggerEvent } from '@fluxgate/shared';
 import { apiKeyAuth, tenantIdOf } from '../auth';
 import { produceTriggerEvent } from '../../kafka/producer';
+import { edgeRateLimit } from '../../ratelimit/edgeBucket';
 
 export const webhooksRouter: IRouter = Router();
 webhooksRouter.use(apiKeyAuth);
+webhooksRouter.use(edgeRateLimit);
 
 // POST /webhooks/:triggerId — body is the event payload, forwarded verbatim.
 webhooksRouter.post('/:triggerId', async (req, res) => {

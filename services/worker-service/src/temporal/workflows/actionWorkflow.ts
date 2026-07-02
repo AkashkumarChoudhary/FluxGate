@@ -1,4 +1,4 @@
-import { proxyActivities } from '@temporalio/workflow';
+import { proxyActivities, rootCause } from '@temporalio/workflow';
 import type { TriggerEvent } from '@fluxgate/shared';
 import type * as activities from '../activities';
 
@@ -26,7 +26,10 @@ export async function actionWorkflow(event: TriggerEvent): Promise<void> {
     await executeHttpAction(executionId, event);
     await finalizeExecution(executionId, 'COMPLETED');
   } catch (err) {
-    const reason = err instanceof Error ? err.message : String(err);
+    // rootCause unwraps ActivityFailure -> ApplicationFailure to get the original message
+    // (e.g. "destination returned 422") instead of the wrapper "Activity task failed".
+    const root: unknown = rootCause(err);
+    const reason = root instanceof Error ? root.message : String(root);
     await finalizeExecution(executionId, 'FAILED', reason);
   }
 }
