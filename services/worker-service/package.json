@@ -1,0 +1,26 @@
+{
+  "name": "@fluxgate/worker-service",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@fluxgate/db": "workspace:*",
+    "@fluxgate/shared": "workspace:*",
+    "@temporalio/client": "^1.10.0",
+    "@temporalio/worker": "^1.10.0",
+    "@temporalio/workflow": "^1.10.0",
+    "@temporalio/activity": "^1.10.0",
+    "@temporalio/common": "^1.10.0",
+    "kafkajs": "^2.2.4",
+    "ioredis": "^5.4.0",
+    "express": "^4.19.0",
+    "prom-client": "^15.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "tsx": "^4.10.0"
+  }
+}
