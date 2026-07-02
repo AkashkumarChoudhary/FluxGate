@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TriggerType {
+  WEBHOOK
+  CRON
+}
+
+enum TriggerStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum ActionType {
+  HTTP
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum TenantStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum StepStatus {
+  COMPLETED
+  FAILED
+}
+
+model Tenant {
+  id         String        @id @default(uuid())
+  name       String
+  apiKeyHash String        @map("api_key_hash")
+  status     TenantStatus  @default(ACTIVE)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  triggers   Trigger[]
+
+  @@map("tenants")
+}
+
+model Trigger {
+  id        String        @id @default(uuid())
+  tenantId  String        @map("tenant_id")
+  name      String
+  type      TriggerType
+  config    Json
+  status    TriggerStatus @default(ACTIVE)
+  createdAt DateTime      @default(now()) @map("created_at")
+  tenant    Tenant        @relation(fields: [tenantId], references: [id])
+  actions   Action[]
+
+  @@index([tenantId])
+  @@map("triggers")
+}
+
+model Action {
+  id        String     @id @default(uuid())
+  triggerId String     @map("trigger_id")
+  tenantId  String     @map("tenant_id")
+  type      ActionType
+  config    Json
+  order     Int        @default(0)
+  createdAt DateTime   @default(now()) @map("created_at")
+  trigger   Trigger    @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+
+  @@index([triggerId])
+  @@map("actions")
+}
+
+model Execution {
+  id                 String          @id @default(uuid())
+  triggerId          String          @map("trigger_id")
+  tenantId           String          @map("tenant_id")
+  dedupeKey          String          @unique @map("dedupe_key")
+  temporalWorkflowId String          @map("temporal_workflow_id")
+  temporalRunId      String?         @map("temporal_run_id")
+  status             ExecutionStatus @default(PENDING)
+  triggeredAt        DateTime        @default(now()) @map("triggered_at")
+  scheduledFor       DateTime?       @map("scheduled_for")
+  completedAt        DateTime?       @map("completed_at")
+  failureReason      String?         @map("failure_reason")
+  steps              ExecutionStep[]
+
+  @@index([tenantId, triggeredAt])
+  @@map("executions")
+}
+
+model ExecutionStep {
+  id            String    @id @default(uuid())
+  executionId   String    @map("execution_id")
+  actionId      String    @map("action_id")
+  order         Int
+  status        StepStatus
+  request       Json
+  response      Json?
+  durationMs    Int       @map("duration_ms")
+  attemptNumber Int       @map("attempt_number")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  execution     Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+
+  @@unique([executionId, actionId, attemptNumber])
+  @@map("execution_steps")
+}

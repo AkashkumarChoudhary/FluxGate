@@ -195,8 +195,8 @@ Grafana dashboard provisioned in compose (datasource + dashboard JSON checked in
 
 **Load harness (k6, in `load/`):** fires webhooks across N synthetic tenants at increasing rates; reports sustained triggers/min, end-to-end p50/p99 latency (webhook accept → execution complete, from the executions table), cron on-time percentage (scheduledFor vs triggeredAt), and rate-limit fairness (hot tenant throttled, others unaffected). These are the numbers that fill the resume bullets.
 
-## 14. Build order (3 weeks at 2–3 hrs/day)
+## 14. Build order (3 pr )
 
-1. **Week 1:** compose stack (Postgres, Redis, Kafka KRaft, Temporal, Temporal UI) → `packages/db` schema + migrations → trigger-service CRUD + API-key auth → webhook endpoint producing to Kafka.
-2. **Week 2:** worker-service consumer → ActionWorkflow + three activities → e2e: curl webhook → workflow visible in Temporal UI → executions/steps rows. First integration tests.
-3. **Week 3:** cron scheduler (poller + Lua claim) → two-layer rate limiting → Prometheus metrics + Grafana provisioning → remaining integration tests → k6 harness + first measured numbers.
+1. **pr 1:** compose stack (Postgres, Redis, Kafka KRaft, Temporal, Temporal UI) → `packages/db` schema + migrations → trigger-service CRUD + API-key auth → webhook endpoint producing to Kafka.
+2. **pr 2:** worker-service consumer → ActionWorkflow + three activities → e2e: curl webhook → workflow visible in Temporal UI → executions/steps rows. First integration tests.
+3. **pr 3:** cron scheduler (poller + Lua claim) → two-layer rate limiting → Prometheus metrics + Grafana provisioning → remaining integration tests → k6 harness + first measured numbers.

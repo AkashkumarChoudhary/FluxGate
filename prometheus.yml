@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: trigger-service
+    static_configs:
+      - targets: ["host.docker.internal:3100"]
+  - job_name: worker-service
+    static_configs:
+      - targets: ["host.docker.internal:3001"]
